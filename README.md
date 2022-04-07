@@ -15,7 +15,7 @@ values for your iModel.
 You will also need to provide a clientId, scope and redirectUri for your application. To register an application,
 go to [https://developer.bentley.com/register/](https://developer.bentley.com/register/).
 
-- Add "Visualization" and "Digital Twin Management" as API Associations
+- Add "Digital Twin Management" as API Associations to get the "imodels:read" scope
 - Select "Desktop/Mobile" as the Application Type
 - Enter "http://localhost:3000/signin-callback" for Redirect URI
 - No logout URI is required
