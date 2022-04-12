@@ -2,8 +2,8 @@
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
 
-import { BriefcaseDb, BriefcaseManager, ECSqlStatement, IModelDb, IModelHost, IModelHostConfiguration } from "@itwin/core-backend";
-import { DbResult, Logger, LogLevel } from "@itwin/core-bentley";
+import { BriefcaseDb, BriefcaseManager, IModelDb, IModelHost, IModelHostConfiguration, SnapshotDb } from "@itwin/core-backend";
+import { Logger, LogLevel } from "@itwin/core-bentley";
 import { BriefcaseIdValue, LocalBriefcaseProps } from "@itwin/core-common";
 import { BackendIModelsAccess } from "@itwin/imodels-access-backend";
 import { NodeCliAuthorizationClient } from "@itwin/node-cli-authorization";
@@ -16,12 +16,13 @@ const IMODELHUB_REQUEST_PROPS = {
 
 const AUTH_CLIENT_CONFIG_PROPS = {
   clientId: "", // EDIT ME! Specify your own clientId
-
   /** These are the minimum scopes needed - you can leave alone or replace with your own entries */
   scope: "imodels:read",
   /** This can be left as-is assuming you've followed the instructions in README.md when registering your application */
   redirectUri: "http://localhost:3000/signin-callback",
 };
+
+const SNAPSHOT_FILE_NAME = "D:\\my-snapshot.bim";
 
 const APP_LOGGER_CATEGORY = "simple-itwinjs-cli-app";
 
@@ -43,12 +44,9 @@ const APP_LOGGER_CATEGORY = "simple-itwinjs-cli-app";
   const iModel: IModelDb = await openIModelFromIModelHub();
   Logger.logInfo(APP_LOGGER_CATEGORY, `iModel ${iModel.name} acquired and opened`);
 
-  const sql = "SELECT ECInstanceId, Description FROM bis.Category";
-  Logger.logInfo(APP_LOGGER_CATEGORY, `Query: ${sql}`);
-  iModel.withPreparedStatement(sql, (stmt: ECSqlStatement) => {
-    while (stmt.step() === DbResult.BE_SQLITE_ROW)
-      Logger.logInfo(APP_LOGGER_CATEGORY, `Id "${stmt.getValue(0).getId()}" Description "${stmt.getValue(1).getString()}"`);
-  });
+  Logger.logInfo(APP_LOGGER_CATEGORY, `Creating snapshot ${SNAPSHOT_FILE_NAME}...`);
+  SnapshotDb.createFrom(iModel, SNAPSHOT_FILE_NAME);
+  Logger.logInfo(APP_LOGGER_CATEGORY, "Snapshot created");
 
 })().catch((reason) => {
   process.stdout.write(`${reason}\n`);
